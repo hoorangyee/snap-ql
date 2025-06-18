@@ -1,5 +1,7 @@
 # snap-ql
 
+https://github.com/user-attachments/assets/0103119a-e6cc-446b-840d-d5e744e0993e
+
 An AI-powered Postgres Client
 * fully local. no data is sent to the cloud
 * use your own OpenAI key
