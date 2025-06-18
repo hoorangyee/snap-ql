@@ -94,6 +94,7 @@ export async function getTableSchema(connectionString: string) {
   `
 
   const res = await client.query(schemaQuery)
+  await client.end()
   const metadata = res.rows as any[]
 
   // Format the schema information into a readable string
