@@ -1,0 +1,97 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
+import { Skeleton } from "../components/ui/skeleton";
+import { Badge } from "../components/ui/badge";
+import { ScrollArea } from "../components/ui/scroll-area";
+
+interface ResultsTableProps {
+  results: any[];
+  isLoading: boolean;
+  query: string;
+}
+
+export const ResultsTable = ({ results, isLoading }: ResultsTableProps) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Query Results</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (results.length === 0) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Query Results</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="text-center py-4 text-muted-foreground">
+            <p className="text-xs">No results to display.</p>
+            <p className="text-[10px] mt-1">Run a query to see the results here.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const columns = Object.keys(results[0]);
+
+  return (
+    <Card className="flex flex-col min-h-0">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 flex-shrink-0">
+        <CardTitle className="text-sm">Query Results</CardTitle>
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">{results.length} rows</Badge>
+      </CardHeader>
+      <CardContent className="pt-0 flex-1 min-h-0">
+        <div className="rounded-md border h-full">
+          <ScrollArea className="h-[400px] w-full">
+            <div className="overflow-x-auto">
+              <Table className="min-w-full">
+                <TableHeader className="sticky top-0 bg-background z-10">
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableHead key={column} className="font-medium text-[10px] h-6 px-2 w-[120px] min-w-[120px] max-w-[200px] border-r last:border-r-0 whitespace-nowrap">
+                        <div className="truncate" title={column}>
+                          {column}
+                        </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {results.map((row, index) => (
+                    <TableRow key={index} className="hover:bg-muted/30">
+                      {columns.map((column) => (
+                        <TableCell key={column} className="font-mono text-[10px] py-1 px-2 border-r last:border-r-0 w-[120px] min-w-[120px] max-w-[200px]">
+                          <div className="truncate" title={String(row[column])}>
+                            {row[column] === null ? (
+                              <span className="text-muted-foreground italic">null</span>
+                            ) : (
+                              String(row[column])
+                            )}
+                          </div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </ScrollArea>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
