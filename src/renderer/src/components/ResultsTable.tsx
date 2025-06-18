@@ -5,6 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Skeleton } from "../components/ui/skeleton";
 import { Badge } from "../components/ui/badge";
 import { ScrollArea } from "../components/ui/scroll-area";
+import { Button } from "./ui/button";
+import { Clipboard, Code } from "lucide-react";
+import { useToast } from "@renderer/hooks/use-toast";
 
 interface ResultsTableProps {
   results: any[];
@@ -13,6 +16,19 @@ interface ResultsTableProps {
 }
 
 export const ResultsTable = ({ results, isLoading }: ResultsTableProps) => {
+  const { toast } = useToast()
+
+  const copyCSV = () => {
+    const csv = [Object.keys(results[0]).join(','), ...results.map(row => Object.values(row).join(','))].join('\n')
+    navigator.clipboard.writeText(csv)
+    toast({ title: 'CSV copied to clipboard' })
+  }
+
+  const copyJSON = () => {
+    navigator.clipboard.writeText(JSON.stringify(results, null, 2))
+    toast({ title: 'JSON copied to clipboard' })
+  }
+
   if (isLoading) {
     return (
       <Card>
@@ -51,12 +67,24 @@ export const ResultsTable = ({ results, isLoading }: ResultsTableProps) => {
   return (
     <Card className="flex flex-grow flex-col min-h-0">
       <CardHeader className="flex flex-row items-center justify-between pb-2 flex-shrink-0">
-        <CardTitle className="text-sm">Query Results</CardTitle>
-        <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">{results.length} rows</Badge>
+        <div className="flex items-center space-x-2">
+          <CardTitle className="text-sm">Query Results</CardTitle>
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">{results.length} rows</Badge>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button variant="secondary" size="sm" className="text-[10px] cursor-pointer" onClick={copyCSV}>
+            <Clipboard className="size-2" />
+            CSV 
+          </Button>
+          <Button variant="secondary" size="sm" className="text-[10px] cursor-pointer" onClick={copyJSON}>
+            <Code className="size-2" />
+            JSON
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="pt-0 flex-1 min-h-0">
         <div className="rounded-md border h-full">
-          <div className="overflow-x-auto overflow-y-auto max-h-[600px]">
+          <div className="overflow-x-auto overflow-y-auto max-h-[600px] select-text">
             <Table className="min-w-full">
               <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>

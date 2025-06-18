@@ -30,7 +30,7 @@ export const AIChat = ({ onUserQuery, isGenerating }: AIChatProps) => {
       <div className="flex items-center space-x-2">
         <div className="flex items-center space-x-1.5 text-xs font-medium text-muted-foreground">
           <Bot className="w-3.5 h-3.5" />
-          <span>AI Assistant</span>
+          <span>Ask AI</span>
         </div>
 
         <div className="flex-1 flex items-center space-x-2">
@@ -38,7 +38,7 @@ export const AIChat = ({ onUserQuery, isGenerating }: AIChatProps) => {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Describe the data you want to query (e.g., 'show me all users from last week')"
+            placeholder="Describe what you want to query (e.g., 'show me all users from last week')"
             className="flex-1 h-8 text-xs"
           />
 

@@ -5,6 +5,8 @@ import { ResultsTable } from './components/ResultsTable'
 import { AIChat } from './components/AIChat'
 import { Settings } from './components/Settings'
 import { Toaster } from './components/ui/toaster'
+import { useToast } from './hooks/use-toast'
+import { Button } from './components/ui/button'
 
 interface QueryHistory {
   id: string
@@ -22,21 +24,28 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
 
-  const handleRunQuery = async () => {
+  const { toast } = useToast()
+
+  const runQuery = async (query: string) => {
     setIsLoading(true)
     try {
-      const res = await window.context.runQuery(sqlQuery)
+      const res = await window.context.runQuery(query)
       if (res.error) {
         setError(res.error)
         setQueryResults([])
       } else {
         setQueryResults(res.data)
         setError(null)
+        toast({
+          title: 'Query executed successfully',
+          description: 'You can ask the AI to fine tune the query',
+          duration: 1500
+        })
 
         // Add to history
         const historyEntry: QueryHistory = {
           id: Date.now().toString(),
-          query: sqlQuery,
+          query: query,
           results: res.data,
           timestamp: new Date()
         }
@@ -53,12 +62,23 @@ const Index = () => {
 
   const handleAIQuery = async (userQuery: string) => {
     setIsGenerating(true)
+    toast({
+      title: 'Generating query...',
+      description: 'The query is being generated...',
+      duration: 1500,
+    })
     try {
       const res = await window.context.generateQuery(userQuery, sqlQuery ?? '')
       if (res.error) {
         setError(res.error)
       } else {
         setSqlQuery(res.data)
+        toast({
+          title: 'Query generated!',
+          description: 'The query was generated successfully',
+          duration: 1500,
+          action: <Button onClick={() => runQuery(res.data)}>Run!</Button>
+        })
       }
     } catch (error: any) {
       setError(error.message)
@@ -95,7 +115,7 @@ const Index = () => {
                 <SQLEditor
                   value={sqlQuery}
                   onChange={setSqlQuery}
-                  onRun={handleRunQuery}
+                  onRun={() => runQuery(sqlQuery)}
                   isLoading={isLoading}
                 />
               </div>

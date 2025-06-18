@@ -1,8 +1,9 @@
-
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Loader2 } from "lucide-react";
+import CodeMirror from "@uiw/react-codemirror";
+import { sql, SQLDialect } from "@codemirror/lang-sql";
 
 interface SQLEditorProps {
   value: string;
@@ -31,15 +32,22 @@ export const SQLEditor = ({ value, onChange, onRun, isLoading }: SQLEditorProps)
         </Button>
       </CardHeader>
       <CardContent className="pt-0">
-        <Textarea
+        <CodeMirror
+          value={value}
+          onChange={(value) => onChange(value)}
+          extensions={[sql()]}
+          height="160px"
+        />
+
+        {/* <Textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Enter your SQL query here..."
           className="min-h-[160px] font-mono text-xs leading-4"
           style={{
             fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
-          }}
-        />
+          }} */}
+        {/* /> */}
       </CardContent>
     </Card>
   );

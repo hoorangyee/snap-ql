@@ -1,5 +1,5 @@
 
-import { Database, Settings as SettingsIcon, Code, History, Clock } from "lucide-react";
+import { Database, Settings as SettingsIcon, Code, History, Clock, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -52,8 +52,9 @@ export const Sidebar = ({ currentView, onViewChange, queryHistory, onHistorySele
     <div className="w-56 bg-card border-r border-border flex flex-col">
       <div className="p-3 border-b border-border">
         <div className="flex items-center space-x-2">
-          <Database className="w-4 h-4 text-primary" />
-          <h1 className="text-sm font-semibold">PostgreSQL Builder</h1>
+          <Zap className="w-4 h-4 text-primary" />
+          <h1 className="text-sm font-semibold">SnapQL</h1>
+          <p className="text-xs text-muted-foreground">beta 0.01</p>
         </div>
       </div>
 
