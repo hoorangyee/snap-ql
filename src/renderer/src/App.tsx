@@ -7,6 +7,7 @@ import { Settings } from './components/Settings'
 import { Toaster } from './components/ui/toaster'
 import { useToast } from './hooks/use-toast'
 import { Button } from './components/ui/button'
+import { ThemeProvider } from './components/ui/theme-provider'
 
 interface QueryHistory {
   id: string
@@ -65,7 +66,7 @@ const Index = () => {
     toast({
       title: 'Generating query...',
       description: 'The query is being generated...',
-      duration: 1500,
+      duration: 1500
     })
     try {
       const res = await window.context.generateQuery(userQuery, sqlQuery ?? '')
@@ -93,45 +94,47 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <Sidebar
-        currentView={currentView}
-        onViewChange={setCurrentView}
-        queryHistory={queryHistory}
-        onHistorySelect={handleHistorySelect}
-      />
+    <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+      <div className="min-h-screen bg-background flex">
+        <Sidebar
+          currentView={currentView}
+          onViewChange={setCurrentView}
+          queryHistory={queryHistory}
+          onHistorySelect={handleHistorySelect}
+        />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* AI Chat Header */}
-        <div className="border-b bg-card p-3 flex-shrink-0">
-          <AIChat onUserQuery={handleAIQuery} isGenerating={isGenerating} />
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* AI Chat Header */}
+          <div className="border-b bg-card p-3 flex-shrink-0">
+            <AIChat onUserQuery={handleAIQuery} isGenerating={isGenerating} />
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 p-3 min-h-0">
+            {currentView === 'editor' ? (
+              <div className="space-y-3 h-full flex flex-col">
+                <div className="flex-shrink-0">
+                  <SQLEditor
+                    value={sqlQuery}
+                    onChange={setSqlQuery}
+                    onRun={() => runQuery(sqlQuery)}
+                    isLoading={isLoading}
+                  />
+                </div>
+                {error && <div className="text-red-500">{error}</div>}
+                <div className="flex-1 min-h-0 flex-grow">
+                  <ResultsTable results={queryResults} isLoading={isLoading} query={sqlQuery} />
+                </div>
+              </div>
+            ) : (
+              <Settings />
+            )}
+          </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-3 min-h-0">
-          {currentView === 'editor' ? (
-            <div className="space-y-3 h-full flex flex-col">
-              <div className="flex-shrink-0">
-                <SQLEditor
-                  value={sqlQuery}
-                  onChange={setSqlQuery}
-                  onRun={() => runQuery(sqlQuery)}
-                  isLoading={isLoading}
-                />
-              </div>
-              {error && <div className="text-red-500">{error}</div>}
-              <div className="flex-1 min-h-0 flex-grow">
-                <ResultsTable results={queryResults} isLoading={isLoading} query={sqlQuery} />
-              </div>
-            </div>
-          ) : (
-            <Settings />
-          )}
-        </div>
+        <Toaster />
       </div>
-
-      <Toaster />
-    </div>
+    </ThemeProvider>
   )
 }
 

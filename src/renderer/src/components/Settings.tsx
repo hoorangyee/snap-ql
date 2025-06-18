@@ -5,6 +5,7 @@ import { Label } from '../components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { TestTube } from 'lucide-react'
 import { useToast } from '../hooks/use-toast'
+import { ModeToggle } from './ui/mode-toggle'
 
 export const Settings = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -188,6 +189,20 @@ export const Settings = () => {
           >
             <span>{isSavingApiKey ? 'Saving...' : 'Save Key'}</span>
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Theme Settings</CardTitle>
+          <CardDescription className="text-xs">
+            Toggle between light, dark, and system themes.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex">
+            <ModeToggle />
+          </div>
         </CardContent>
       </Card>
 

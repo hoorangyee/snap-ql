@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Loader2 } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
 import { sql, SQLDialect } from "@codemirror/lang-sql";
+import { useTheme } from "./ui/theme-provider";
 
 interface SQLEditorProps {
   value: string;
@@ -13,6 +14,8 @@ interface SQLEditorProps {
 }
 
 export const SQLEditor = ({ value, onChange, onRun, isLoading }: SQLEditorProps) => {
+
+  const { theme } = useTheme()
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-3">
@@ -37,6 +40,7 @@ export const SQLEditor = ({ value, onChange, onRun, isLoading }: SQLEditorProps)
           onChange={(value) => onChange(value)}
           extensions={[sql()]}
           height="160px"
+          theme={theme === 'dark' ? 'dark' : 'light'}
         />
 
         {/* <Textarea
