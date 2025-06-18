@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { runQuery, testPostgresConnection } from './lib/db'
+import { getConnectionString, setConnectionString } from './lib/state'
 
 function createWindow(): void {
   // Create the browser window.
@@ -51,8 +53,39 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle('setConnectionString', async (_, connectionString) => {
+    console.log('Setting connection string: ', connectionString)
+    const valid = await testPostgresConnection(connectionString)
+    if (valid) {
+      await setConnectionString(connectionString.length > 0 ? connectionString : null)
+      return true
+    } else {
+      return false
+    }
+  })
+
+  ipcMain.handle('getConnectionString', async () => {
+    return (await getConnectionString()) ?? ''
+  })
+
+  ipcMain.handle('runQuery', async (_, query) => {
+    try {
+      const connectionString = await getConnectionString()
+      if (connectionString.length === 0) {
+        return { error: 'No connection string set' }
+      }
+      const res = await runQuery(connectionString, query)
+      return {
+        error: null,
+        data: res.rows
+      }
+    } catch (error: any) {
+      return {
+        error: error.message,
+        data: null
+      }
+    }
+  })
 
   createWindow()
 

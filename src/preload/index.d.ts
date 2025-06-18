@@ -1,6 +1,12 @@
 declare global {
   interface Window {
-    // electron: ElectronAPI
-    context: object
+    context: {
+      locale: string
+      getConnectionString: () => Promise<string>
+      setConnectionString: (connectionString: string) => Promise<boolean>
+      runQuery: (query: string) => Promise<{ error: string | null; data: any }>
+    }
   }
 }
+
+export {}
