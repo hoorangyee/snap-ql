@@ -11,6 +11,10 @@ export const Settings = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isTesting, setIsTesting] = useState(false)
   const [connectionString, setConnectionString] = useState<string>('')
+  const [openAIApiKey, setOpenAIApiKey] = useState<string>('')
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null)
+  const [apiKeySuccess, setApiKeySuccess] = useState<string | null>(null)
+  const [isSavingApiKey, setIsSavingApiKey] = useState(false)
 
   const { toast } = useToast()
 
@@ -34,6 +38,21 @@ export const Settings = () => {
     loadSavedConnectionString()
   }, [toast])
 
+  // Load the saved OpenAI API key when the component mounts
+  useEffect(() => {
+    const loadSavedApiKey = async () => {
+      try {
+        const savedApiKey = await window.context.getOpenAiKey()
+        if (savedApiKey) {
+          setOpenAIApiKey(savedApiKey)
+        }
+      } catch (error: any) {
+        setApiKeyError('Failed to load the OpenAI API key. Please try again.')
+      }
+    }
+    loadSavedApiKey()
+  }, [toast])
+
   const updateConnectionString = async () => {
     setIsTesting(true)
     setSuccessMessage(null)
@@ -52,6 +71,21 @@ export const Settings = () => {
       )
     } finally {
       setIsTesting(false)
+    }
+  }
+
+  const updateOpenAIApiKey = async () => {
+    setIsSavingApiKey(true)
+    setApiKeySuccess(null)
+    setApiKeyError(null)
+    try {
+      await window.context.setOpenAiKey(openAIApiKey)
+      setApiKeyError(null)
+      setApiKeySuccess('OpenAI API key saved successfully.')
+    } catch (error: any) {
+      setApiKeyError('Failed to save the OpenAI API key: ' + error.message)
+    } finally {
+      setIsSavingApiKey(false)
     }
   }
 
@@ -102,6 +136,57 @@ export const Settings = () => {
           >
             <TestTube className="w-3.5 h-3.5" />
             <span>{isTesting ? 'Testing Connection...' : 'Test & Set'}</span>
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">OpenAI API Key</CardTitle>
+              <CardDescription className="text-xs">
+                Enter your OpenAI API key to enable AI-powered features.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3 pt-0">
+          <div className="space-y-1.5">
+            <Label htmlFor="openai-api-key" className="text-xs">
+              API Key
+            </Label>
+            <Input
+              id="openai-api-key"
+              value={openAIApiKey}
+              onChange={(e) => setOpenAIApiKey(e.target.value)}
+              placeholder="sk-..."
+              className="font-mono text-xs h-8"
+              autoComplete="off"
+            />
+            <p className="text-xs text-muted-foreground">
+              You can create an API key at{' '}
+              <a
+                href="https://platform.openai.com/account/api-keys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                OpenAI API Keys
+              </a>
+              .
+            </p>
+            {apiKeyError && <p className="text-xs text-destructive">{apiKeyError}</p>}
+            {apiKeySuccess && <p className="text-xs text-green-500">{apiKeySuccess}</p>}
+          </div>
+
+          <Button
+            onClick={updateOpenAIApiKey}
+            disabled={isSavingApiKey || !openAIApiKey.trim()}
+            className="flex items-center space-x-1.5 h-8 px-3 text-xs"
+            size="sm"
+          >
+            <span>{isSavingApiKey ? 'Saving...' : 'Save Key'}</span>
           </Button>
         </CardContent>
       </Card>

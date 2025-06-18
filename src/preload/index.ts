@@ -10,7 +10,11 @@ try {
     getConnectionString: async () => await ipcRenderer.invoke('getConnectionString'),
     setConnectionString: async (connectionString: string) =>
       await ipcRenderer.invoke('setConnectionString', connectionString),
-    runQuery: async (query: string) => await ipcRenderer.invoke('runQuery', query)
+    runQuery: async (query: string) => await ipcRenderer.invoke('runQuery', query),
+    generateQuery: async (input: string, sqlQuery: string) =>
+      await ipcRenderer.invoke('generateQuery', input, sqlQuery),
+    getOpenAiKey: async () => await ipcRenderer.invoke('getOpenAiKey'),
+    setOpenAiKey: async (openAiKey: string) => await ipcRenderer.invoke('setOpenAiKey', openAiKey)
   })
 } catch (error) {
   console.error(error)

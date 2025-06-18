@@ -2,8 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { runQuery, testPostgresConnection } from './lib/db'
-import { getConnectionString, setConnectionString } from './lib/state'
+import { generateQuery, runQuery, testPostgresConnection } from './lib/db'
+import { getConnectionString, getOpenAiKey, setConnectionString, setOpenAiKey } from './lib/state'
 
 function createWindow(): void {
   // Create the browser window.
@@ -66,6 +66,32 @@ app.whenReady().then(() => {
 
   ipcMain.handle('getConnectionString', async () => {
     return (await getConnectionString()) ?? ''
+  })
+
+  ipcMain.handle('getOpenAiKey', async () => {
+    return (await getOpenAiKey()) ?? ''
+  })
+
+  ipcMain.handle('setOpenAiKey', async (_, openAiKey) => {
+    await setOpenAiKey(openAiKey)
+  })
+
+  ipcMain.handle('generateQuery', async (_, input, existingQuery) => {
+    try {
+      console.log('Generating query with input: ', input, 'and existing query: ', existingQuery)
+      const connectionString = await getConnectionString()
+      const openAiKey = await getOpenAiKey()
+      const query = await generateQuery(input, connectionString, openAiKey, existingQuery)
+      return {
+        error: null,
+        data: query
+      }
+    } catch (error: any) {
+      return {
+        error: error.message,
+        data: null
+      }
+    }
   })
 
   ipcMain.handle('runQuery', async (_, query) => {

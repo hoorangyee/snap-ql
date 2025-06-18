@@ -5,10 +5,12 @@ import { z } from 'zod'
 
 const settingsSchema = z.object({
   connectionString: z.string().nullable(),
+  openAiKey: z.string().nullable()
 })
 
 const defaultSettings = {
   connectionString: null,
+  openAiKey: null
 }
 
 function rootDir() {
@@ -47,8 +49,19 @@ export async function getConnectionString() {
   return settings.connectionString
 }
 
+export async function getOpenAiKey() {
+  const settings = await getSettings()
+  return settings.openAiKey
+}
+
 export async function setConnectionString(connectionString: string) {
   const settings = await getSettings()
   settings.connectionString = connectionString
+  await setSettings(settings)
+}
+
+export async function setOpenAiKey(openAiKey: string) {
+  const settings = await getSettings()
+  settings.openAiKey = openAiKey
   await setSettings(settings)
 }

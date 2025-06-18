@@ -19,13 +19,12 @@ const Index = () => {
   const [queryResults, setQueryResults] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [queryHistory, setQueryHistory] = useState<QueryHistory[]>([])
-  const [rawResults, setRawResults] = useState<any>('Test')
   const [error, setError] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const handleRunQuery = async () => {
     setIsLoading(true)
     try {
-      setRawResults('Running query...')
       const res = await window.context.runQuery(sqlQuery)
       if (res.error) {
         setError(res.error)
@@ -52,8 +51,20 @@ const Index = () => {
     }
   }
 
-  const handleAIQuery = (generatedQuery: string) => {
-    setSqlQuery(generatedQuery)
+  const handleAIQuery = async (userQuery: string) => {
+    setIsGenerating(true)
+    try {
+      const res = await window.context.generateQuery(userQuery, sqlQuery ?? '')
+      if (res.error) {
+        setError(res.error)
+      } else {
+        setSqlQuery(res.data)
+      }
+    } catch (error: any) {
+      setError(error.message)
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   const handleHistorySelect = (historyItem: QueryHistory) => {
@@ -73,7 +84,7 @@ const Index = () => {
       <div className="flex-1 flex flex-col min-w-0">
         {/* AI Chat Header */}
         <div className="border-b bg-card p-3 flex-shrink-0">
-          <AIChat onQueryGenerated={handleAIQuery} />
+          <AIChat onUserQuery={handleAIQuery} isGenerating={isGenerating} />
         </div>
 
         {/* Main Content */}
@@ -89,7 +100,7 @@ const Index = () => {
                 />
               </div>
               {error && <div className="text-red-500">{error}</div>}
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 min-h-0 flex-grow">
                 <ResultsTable results={queryResults} isLoading={isLoading} query={sqlQuery} />
               </div>
             </div>
