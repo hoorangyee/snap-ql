@@ -1,6 +1,6 @@
 import pg from 'pg'
-import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
+import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod'
 
 export async function testPostgresConnection(connectionString: string): Promise<boolean> {
@@ -32,6 +32,9 @@ export async function generateQuery(
   existingQuery: string
 ) {
   try {
+    const openai = createOpenAI({
+      apiKey: openAiKey
+    })
     const tableSchema = await getTableSchema(connectionString)
     const existing = existingQuery.trim()
 
