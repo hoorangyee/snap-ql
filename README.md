@@ -1,7 +1,7 @@
 # SnapQL
 cursor for data ⚡️ - explore your postgresql db in seconds
 
-https://github.com/user-attachments/assets/0103119a-e6cc-446b-840d-d5e744e0993e
+https://github.com/user-attachments/assets/15da0076-7bc4-4a20-a65b-103838ce3bc5
 
 * generate schema-aware queries in seconds with AI
 * supports any PostgreSQL database
