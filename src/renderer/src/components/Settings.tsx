@@ -117,6 +117,7 @@ export const Settings = () => {
             </Label>
             <Input
               id="connection-string"
+              type="password"
               value={connectionString}
               onChange={(e) => setConnectionString(e.target.value)}
               placeholder="postgresql://username:password@hostname:port/database"
@@ -159,6 +160,7 @@ export const Settings = () => {
             </Label>
             <Input
               id="openai-api-key"
+              type="password"
               value={openAIApiKey}
               onChange={(e) => setOpenAIApiKey(e.target.value)}
               placeholder="sk-..."
