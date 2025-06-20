@@ -4,17 +4,17 @@ import fs from 'fs-extra'
 import { z } from 'zod'
 
 const settingsSchema = z.object({
-  connectionString: z.string().nullable(),
-  openAiKey: z.string().nullable(),
-  openAiBaseUrl: z.string().nullable(),
-  openAiModel: z.string().nullable()
+  connectionString: z.string().optional(),
+  openAiKey: z.string().optional(),
+  openAiBaseUrl: z.string().optional(),
+  openAiModel: z.string().optional()
 })
 
-const defaultSettings = {
-  connectionString: null,
-  openAiKey: null,
-  openAiBaseUrl: null,
-  openAiModel: null
+const defaultSettings: z.infer<typeof settingsSchema> = {
+  connectionString: undefined,
+  openAiKey: undefined,
+  openAiBaseUrl: undefined,
+  openAiModel: undefined
 }
 
 function rootDir() {
