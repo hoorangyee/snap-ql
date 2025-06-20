@@ -3,7 +3,16 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../logo.png?asset'
 import { generateQuery, runQuery, testPostgresConnection } from './lib/db'
-import { getConnectionString, getOpenAiKey, setConnectionString, setOpenAiKey } from './lib/state'
+import {
+  getConnectionString,
+  getOpenAiKey,
+  setConnectionString,
+  setOpenAiKey,
+  getOpenAiBaseUrl,
+  setOpenAiBaseUrl,
+  getOpenAiModel,
+  setOpenAiModel
+} from './lib/state'
 
 function createWindow(): void {
   // Create the browser window.
@@ -76,12 +85,37 @@ app.whenReady().then(() => {
     await setOpenAiKey(openAiKey)
   })
 
+  ipcMain.handle('getOpenAiBaseUrl', async () => {
+    return (await getOpenAiBaseUrl()) ?? ''
+  })
+
+  ipcMain.handle('setOpenAiBaseUrl', async (_, openAiBaseUrl) => {
+    await setOpenAiBaseUrl(openAiBaseUrl)
+  })
+
+  ipcMain.handle('getOpenAiModel', async () => {
+    return (await getOpenAiModel()) ?? ''
+  })
+
+  ipcMain.handle('setOpenAiModel', async (_, openAiModel) => {
+    await setOpenAiModel(openAiModel)
+  })
+
   ipcMain.handle('generateQuery', async (_, input, existingQuery) => {
     try {
       console.log('Generating query with input: ', input, 'and existing query: ', existingQuery)
       const connectionString = await getConnectionString()
       const openAiKey = await getOpenAiKey()
-      const query = await generateQuery(input, connectionString, openAiKey, existingQuery)
+      const openAiBaseUrl = await getOpenAiBaseUrl()
+      const openAiModel = await getOpenAiModel()
+      const query = await generateQuery(
+        input,
+        connectionString,
+        openAiKey,
+        existingQuery,
+        openAiBaseUrl,
+        openAiModel
+      )
       return {
         error: null,
         data: query
