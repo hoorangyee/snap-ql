@@ -8,6 +8,8 @@ https://github.com/user-attachments/assets/15da0076-7bc4-4a20-a65b-103838ce3bc5
 * local desktop app - your database credentials don't leave your computer
 * use your own OpenAI key
 
+💬 [Join the Telegram group to chat with the devs + share feedback!](https://t.me/+QJu4_a2yImo3OTY0)
+
 ### Build SnapQL locally
 I will eventually ship some precompiled binaries, but that takes some setup. In the meantime, follow these steps to build a local copy:
 
