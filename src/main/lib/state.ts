@@ -5,12 +5,16 @@ import { z } from 'zod'
 
 const settingsSchema = z.object({
   connectionString: z.string().nullable(),
-  openAiKey: z.string().nullable()
+  openAiKey: z.string().nullable(),
+  openAiBaseUrl: z.string().nullable(),
+  openAiModel: z.string().nullable()
 })
 
 const defaultSettings = {
   connectionString: null,
-  openAiKey: null
+  openAiKey: null,
+  openAiBaseUrl: null,
+  openAiModel: null
 }
 
 function rootDir() {
@@ -54,6 +58,16 @@ export async function getOpenAiKey() {
   return settings.openAiKey
 }
 
+export async function getOpenAiBaseUrl() {
+  const settings = await getSettings()
+  return settings.openAiBaseUrl
+}
+
+export async function getOpenAiModel() {
+  const settings = await getSettings()
+  return settings.openAiModel
+}
+
 export async function setConnectionString(connectionString: string) {
   const settings = await getSettings()
   settings.connectionString = connectionString
@@ -63,5 +77,17 @@ export async function setConnectionString(connectionString: string) {
 export async function setOpenAiKey(openAiKey: string) {
   const settings = await getSettings()
   settings.openAiKey = openAiKey
+  await setSettings(settings)
+}
+
+export async function setOpenAiBaseUrl(openAiBaseUrl: string) {
+  const settings = await getSettings()
+  settings.openAiBaseUrl = openAiBaseUrl
+  await setSettings(settings)
+}
+
+export async function setOpenAiModel(openAiModel: string) {
+  const settings = await getSettings()
+  settings.openAiModel = openAiModel
   await setSettings(settings)
 }

@@ -1,6 +1,6 @@
 import pg from 'pg'
-import { generateObject } from "ai";
-import { createOpenAI } from '@ai-sdk/openai';
+import { generateObject } from 'ai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { z } from 'zod'
 
 export async function testPostgresConnection(connectionString: string): Promise<boolean> {
@@ -29,17 +29,23 @@ export async function generateQuery(
   input: string,
   connectionString: string,
   openAiKey: string,
-  existingQuery: string
+  existingQuery: string,
+  openAiUrl?: string,
+  openAiModel?: string
 ) {
   try {
     const openai = createOpenAI({
-      apiKey: openAiKey
+      apiKey: openAiKey,
+      baseURL: openAiUrl || undefined
     })
     const tableSchema = await getTableSchema(connectionString)
     const existing = existingQuery.trim()
 
+    // Use provided model or default to gpt-4o
+    const modelToUse = openAiModel || 'gpt-4o'
+
     const result = await generateObject({
-      model: openai('gpt-4o'),
+      model: openai(modelToUse),
       system: `You are a SQL (postgres) and data visualization expert. Your job is to help the user write or modify a SQL query to retrieve the data they need. The table schema is as follows:
       ${tableSchema}
       Only retrieval queries are allowed.
