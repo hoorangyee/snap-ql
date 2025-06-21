@@ -18,3 +18,10 @@ I will eventually ship some precompiled binaries, but that takes some setup. In 
 * if you're on MacOS, you will need to have XCode installed
 * run `npm run build:mac` or `npm run build:win` depending on your platform
 * install the binary located in `./dist`
+
+<a href="https://news.ycombinator.com/item?id=44326620">
+  <img
+    alt="Featured on Hacker News"
+    src="https://hackerbadge.now.sh/api?id=44326620"
+  />
+</a>
