@@ -1,4 +1,7 @@
-# SnapQL
+# Snap-QL for MS SQL Server
+
+> 🔄 **Forked from [NickTikhonov/snap-ql](https://github.com/NickTikhonov/snap-ql)** - Originally designed for PostgreSQL, now ported to work with Microsoft SQL Server.
+
 cursor for data ⚡️ - explore your MSSQL db in seconds
 
 https://github.com/user-attachments/assets/15da0076-7bc4-4a20-a65b-103838ce3bc5
