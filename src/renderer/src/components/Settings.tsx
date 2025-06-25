@@ -165,7 +165,7 @@ export const Settings = () => {
       <div>
         <h2 className="text-lg font-bold">Settings</h2>
         <p className="text-muted-foreground text-sm">
-          Configure your PostgreSQL database connection.
+          Configure your MSSQL database connection.
         </p>
       </div>
 
@@ -175,7 +175,7 @@ export const Settings = () => {
             <div>
               <CardTitle className="text-base">Database Connection</CardTitle>
               <CardDescription className="text-xs">
-                Enter your PostgreSQL connection string to connect to your database.
+                Enter your MSSQL connection string to connect to your database.
               </CardDescription>
             </div>
           </div>
@@ -190,11 +190,11 @@ export const Settings = () => {
               type="password"
               value={connectionString}
               onChange={(e) => setConnectionString(e.target.value)}
-              placeholder="postgresql://username:password@hostname:port/database"
+              placeholder="mssql://username:password@hostname:port/database"
               className="font-mono text-xs h-8"
             />
             <p className="text-xs text-muted-foreground">
-              Format: postgresql://username:password@hostname:port/database
+              Format: mssql://username:password@hostname:port/database
             </p>
             {errorMessage && <p className="text-xs text-destructive">{errorMessage}</p>}
             {successMessage && <p className="text-xs text-green-500">{successMessage}</p>}
@@ -356,7 +356,7 @@ export const Settings = () => {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">About</CardTitle>
           <CardDescription className="text-xs">
-            PostgreSQL Query Builder and Executor
+            MSSQL Query Builder and Executor
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0">

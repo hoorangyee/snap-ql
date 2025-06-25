@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../logo.png?asset'
-import { generateQuery, runQuery, testPostgresConnection } from './lib/db'
+import { generateQuery, runQuery, testMssqlConnection } from './lib/db'
 import {
   getConnectionString,
   getOpenAiKey,
@@ -64,7 +64,7 @@ app.whenReady().then(() => {
 
   ipcMain.handle('setConnectionString', async (_, connectionString) => {
     console.log('Setting connection string: ', connectionString)
-    const valid = await testPostgresConnection(connectionString)
+    const valid = await testMssqlConnection(connectionString)
     if (valid) {
       await setConnectionString(connectionString.length > 0 ? connectionString : null)
       return true
