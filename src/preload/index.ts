@@ -7,9 +7,9 @@ if (!process.contextIsolated) {
 try {
   contextBridge.exposeInMainWorld('context', {
     locale: navigator.language,
-    getConnectionString: async () => await ipcRenderer.invoke('getConnectionString'),
-    setConnectionString: async (connectionString: string) =>
-      await ipcRenderer.invoke('setConnectionString', connectionString),
+    getConnectionConfig: async () => await ipcRenderer.invoke('getConnectionConfig'),
+    setConnectionConfig: async (config: any) =>
+      await ipcRenderer.invoke('setConnectionConfig', config),
     runQuery: async (query: string) => await ipcRenderer.invoke('runQuery', query),
     generateQuery: async (input: string, sqlQuery: string) =>
       await ipcRenderer.invoke('generateQuery', input, sqlQuery),

@@ -12,7 +12,11 @@ export const Settings = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [isTesting, setIsTesting] = useState(false)
-  const [connectionString, setConnectionString] = useState<string>('')
+  const [host, setHost] = useState('')
+  const [port, setPort] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [database, setDatabase] = useState('')
   const [openAIApiKey, setOpenAIApiKey] = useState<string>('')
   const [apiKeyError, setApiKeyError] = useState<string | null>(null)
   const [apiKeySuccess, setApiKeySuccess] = useState<string | null>(null)
@@ -29,24 +33,28 @@ export const Settings = () => {
 
   const { toast } = useToast()
 
-  // Load the saved connection string when the component mounts
+  // Load the saved connection config when the component mounts
   useEffect(() => {
-    const loadSavedConnectionString = async () => {
+    const loadSavedConfig = async () => {
       try {
-        const savedConnectionString = await window.context.getConnectionString()
-        if (savedConnectionString) {
-          setConnectionString(savedConnectionString)
+        const cfg = await window.context.getConnectionConfig()
+        if (cfg) {
+          setHost(cfg.host || '')
+          setPort(cfg.port ? String(cfg.port) : '')
+          setUsername(cfg.username || '')
+          setPassword(cfg.password || '')
+          setDatabase(cfg.database || '')
         }
       } catch (error) {
         toast({
-          title: 'Error loading connection string',
-          description: 'Failed to load the connection string. Please try again.',
+          title: 'Error loading connection settings',
+          description: 'Failed to load the connection configuration. Please try again.',
           variant: 'destructive'
         })
       }
     }
 
-    loadSavedConnectionString()
+    loadSavedConfig()
   }, [toast])
 
   // Load the saved OpenAI API key when the component mounts
@@ -94,21 +102,28 @@ export const Settings = () => {
     loadSavedModel()
   }, [toast])
 
-  const updateConnectionString = async () => {
+  const updateConnectionConfig = async () => {
     setIsTesting(true)
     setSuccessMessage(null)
     setErrorMessage(null)
     try {
-      const result = await window.context.setConnectionString(connectionString)
+      const config = {
+        host,
+        port: port ? parseInt(port) : undefined,
+        username,
+        password,
+        database
+      }
+      const result = await window.context.setConnectionConfig(config)
       if (!result) {
-        throw new Error('Failed to save connection string')
+        throw new Error('Failed to save connection settings')
       }
       setErrorMessage(null)
-      setSuccessMessage('Connection string saved successfully.')
+      setSuccessMessage('Connection settings saved successfully.')
     } catch (error) {
-      console.error('Error saving connection string:', error)
+      console.error('Error saving connection config:', error)
       setErrorMessage(
-        'Failed to connect to the database. Please check your connection string or server and try again.'
+        'Failed to connect to the database. Please check your connection details and try again.'
       )
     } finally {
       setIsTesting(false)
@@ -175,34 +190,38 @@ export const Settings = () => {
             <div>
               <CardTitle className="text-base">Database Connection</CardTitle>
               <CardDescription className="text-xs">
-                Enter your MSSQL connection string to connect to your database.
+                Enter your MSSQL connection details.
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3 pt-0">
           <div className="space-y-1.5">
-            <Label htmlFor="connection-string" className="text-xs">
-              Connection String
-            </Label>
-            <Input
-              id="connection-string"
-              type="password"
-              value={connectionString}
-              onChange={(e) => setConnectionString(e.target.value)}
-              placeholder="mssql://username:password@hostname:port/database"
-              className="font-mono text-xs h-8"
-            />
-            <p className="text-xs text-muted-foreground">
-              Format: mssql://username:password@hostname:port/database
-            </p>
-            {errorMessage && <p className="text-xs text-destructive">{errorMessage}</p>}
-            {successMessage && <p className="text-xs text-green-500">{successMessage}</p>}
+            <Label htmlFor="db-host" className="text-xs">Host</Label>
+            <Input id="db-host" value={host} onChange={(e) => setHost(e.target.value)} className="font-mono text-xs h-8" />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="db-port" className="text-xs">Port</Label>
+            <Input id="db-port" value={port} onChange={(e) => setPort(e.target.value)} className="font-mono text-xs h-8" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="db-user" className="text-xs">Username</Label>
+            <Input id="db-user" value={username} onChange={(e) => setUsername(e.target.value)} className="font-mono text-xs h-8" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="db-pass" className="text-xs">Password</Label>
+            <Input id="db-pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="font-mono text-xs h-8" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="db-name" className="text-xs">Database</Label>
+            <Input id="db-name" value={database} onChange={(e) => setDatabase(e.target.value)} className="font-mono text-xs h-8" />
+          </div>
+          {errorMessage && <p className="text-xs text-destructive">{errorMessage}</p>}
+          {successMessage && <p className="text-xs text-green-500">{successMessage}</p>}
 
           <Button
-            onClick={updateConnectionString}
-            disabled={isTesting || !connectionString.trim()}
+            onClick={updateConnectionConfig}
+            disabled={isTesting || !host.trim() || !username.trim() || !database.trim()}
             className="flex items-center space-x-1.5 h-8 px-3 text-xs"
             size="sm"
           >

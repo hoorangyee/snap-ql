@@ -4,9 +4,9 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../logo.png?asset'
 import { generateQuery, runQuery, testMssqlConnection } from './lib/db'
 import {
-  getConnectionString,
+  getConnectionConfig,
   getOpenAiKey,
-  setConnectionString,
+  setConnectionConfig,
   setOpenAiKey,
   getOpenAiBaseUrl,
   setOpenAiBaseUrl,
@@ -62,19 +62,19 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle('setConnectionString', async (_, connectionString) => {
-    console.log('Setting connection string: ', connectionString)
-    const valid = await testMssqlConnection(connectionString)
+  ipcMain.handle('setConnectionConfig', async (_, config) => {
+    console.log('Setting connection config: ', config)
+    const valid = await testMssqlConnection(config)
     if (valid) {
-      await setConnectionString(connectionString.length > 0 ? connectionString : null)
+      await setConnectionConfig(config)
       return true
     } else {
       return false
     }
   })
 
-  ipcMain.handle('getConnectionString', async () => {
-    return (await getConnectionString()) ?? ''
+  ipcMain.handle('getConnectionConfig', async () => {
+    return (await getConnectionConfig()) ?? null
   })
 
   ipcMain.handle('getOpenAiKey', async () => {
@@ -104,18 +104,14 @@ app.whenReady().then(() => {
   ipcMain.handle('generateQuery', async (_, input, existingQuery) => {
     try {
       console.log('Generating query with input: ', input, 'and existing query: ', existingQuery)
-      const connectionString = await getConnectionString()
+      const config = await getConnectionConfig()
       const openAiKey = await getOpenAiKey()
       const openAiBaseUrl = await getOpenAiBaseUrl()
       const openAiModel = await getOpenAiModel()
-      const query = await generateQuery(
-        input,
-        connectionString,
-        openAiKey,
-        existingQuery,
-        openAiBaseUrl,
-        openAiModel
-      )
+      if (!config) {
+        return { error: 'No connection configuration set', data: null }
+      }
+      const query = await generateQuery(input, config, openAiKey, existingQuery, openAiBaseUrl, openAiModel)
       return {
         error: null,
         data: query
@@ -130,14 +126,14 @@ app.whenReady().then(() => {
 
   ipcMain.handle('runQuery', async (_, query) => {
     try {
-      const connectionString = await getConnectionString()
-      if (connectionString.length === 0) {
-        return { error: 'No connection string set' }
+      const config = await getConnectionConfig()
+      if (!config) {
+        return { error: 'No connection configuration set' }
       }
-      const res = await runQuery(connectionString, query)
+      const res = await runQuery(config, query)
       return {
         error: null,
-        data: res.rows
+        data: res
       }
     } catch (error: any) {
       return {

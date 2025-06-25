@@ -3,15 +3,23 @@ import fs from 'fs-extra'
 
 import { z } from 'zod'
 
+const dbConfigSchema = z.object({
+  host: z.string(),
+  port: z.number().optional(),
+  username: z.string(),
+  password: z.string(),
+  database: z.string()
+})
+
 const settingsSchema = z.object({
-  connectionString: z.string().optional(),
+  connectionConfig: dbConfigSchema.optional(),
   openAiKey: z.string().optional(),
   openAiBaseUrl: z.string().optional(),
   openAiModel: z.string().optional()
 })
 
 const defaultSettings: z.infer<typeof settingsSchema> = {
-  connectionString: undefined,
+  connectionConfig: undefined,
   openAiKey: undefined,
   openAiBaseUrl: undefined,
   openAiModel: undefined
@@ -48,9 +56,9 @@ async function setSettings(settings: z.infer<typeof settingsSchema>) {
   await fs.writeJson(path, settings)
 }
 
-export async function getConnectionString() {
+export async function getConnectionConfig() {
   const settings = await getSettings()
-  return settings.connectionString
+  return settings.connectionConfig
 }
 
 export async function getOpenAiKey() {
@@ -68,9 +76,9 @@ export async function getOpenAiModel() {
   return settings.openAiModel
 }
 
-export async function setConnectionString(connectionString: string) {
+export async function setConnectionConfig(config: z.infer<typeof dbConfigSchema>) {
   const settings = await getSettings()
-  settings.connectionString = connectionString
+  settings.connectionConfig = config
   await setSettings(settings)
 }
 

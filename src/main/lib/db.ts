@@ -3,9 +3,24 @@ import { generateObject } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { z } from 'zod'
 
-export async function testMssqlConnection(connectionString: string): Promise<boolean> {
-  console.log('Testing connection string: ', connectionString)
-  const pool = new sql.ConnectionPool(connectionString)
+export interface ConnectionConfig {
+  host: string
+  port?: number
+  username: string
+  password: string
+  database: string
+}
+
+export async function testMssqlConnection(config: ConnectionConfig): Promise<boolean> {
+  console.log('Testing connection config: ', config)
+  const pool = new sql.ConnectionPool({
+    server: config.host,
+    user: config.username,
+    password: config.password,
+    database: config.database,
+    port: config.port,
+    options: { trustServerCertificate: true }
+  })
   try {
     await pool.connect()
     await pool.close()
@@ -16,18 +31,25 @@ export async function testMssqlConnection(connectionString: string): Promise<boo
   }
 }
 
-export async function runQuery(connectionString: string, query: string) {
-  const pool = new sql.ConnectionPool(connectionString)
+export async function runQuery(config: ConnectionConfig, query: string) {
+  const pool = new sql.ConnectionPool({
+    server: config.host,
+    user: config.username,
+    password: config.password,
+    database: config.database,
+    port: config.port,
+    options: { trustServerCertificate: true }
+  })
   await pool.connect()
   const result = await pool.request().query(query)
   await pool.close()
-  console.log('Query result: ', result)
-  return result
+  console.log('Query result: ', result.recordset)
+  return result.recordset
 }
 
 export async function generateQuery(
   input: string,
-  connectionString: string,
+  config: ConnectionConfig,
   openAiKey: string,
   existingQuery: string,
   openAiUrl?: string,
@@ -38,7 +60,7 @@ export async function generateQuery(
       apiKey: openAiKey,
       baseURL: openAiUrl || undefined
     })
-    const tableSchema = await getTableSchema(connectionString)
+    const tableSchema = await getTableSchema(config)
     const existing = existingQuery.trim()
 
     // Use provided model or default to gpt-4o
@@ -72,8 +94,15 @@ export async function generateQuery(
   }
 }
 
-export async function getTableSchema(connectionString: string) {
-  const pool = new sql.ConnectionPool(connectionString)
+export async function getTableSchema(config: ConnectionConfig) {
+  const pool = new sql.ConnectionPool({
+    server: config.host,
+    user: config.username,
+    password: config.password,
+    database: config.database,
+    port: config.port,
+    options: { trustServerCertificate: true }
+  })
   await pool.connect()
   const schemaQuery = `
     SELECT
